@@ -1,0 +1,42 @@
+{
+  "name": "@transformgovsg/zing",
+  "version": "0.0.0",
+  "description": "A lightweight web framework.",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "format": "prettier --check \"**/*.{js,mjs,ts,md,json}\"",
+    "lint": "eslint \"**/*.{js,mjs,ts}\"",
+    "typecheck": "tsc",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@types/node": "^22.14.0",
+    "eslint": "^9.23.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "get-port": "^7.1.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.29.0",
+    "vitest": "^3.1.1"
+  }
+}
