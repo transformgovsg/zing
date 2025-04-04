@@ -22,13 +22,18 @@ ADRs should be numbered sequentially. We will start with this ADR as `0001`.
 
 ## ⚖️ Consequences
 
-- **Advantages 👍:**
-  - Provides clear documentation of architectural choices and their rationale.
-  - Facilitates onboarding of new team members.
-  - Helps maintain architectural consistency over time.
-  - Avoids relearning or re-debating past decisions.
-- **Disadvantages 👎:**
-  - Requires discipline to create and maintain ADRs.
-  - Adds a small overhead to the decision-making process.
-- **Neutral Considerations 👀:**
-  - ADRs capture the _why_ behind a decision at a point in time; the codebase remains the source of truth for the _what_ and _how_.
+### Advantages
+
+- Provides clear documentation of architectural choices and their rationale.
+- Facilitates onboarding of new team members.
+- Helps maintain architectural consistency over time.
+- Avoids relearning or re-debating past decisions.
+
+### Disadvantages
+
+- Requires discipline to create and maintain ADRs.
+- Adds a small overhead to the decision-making process.
+
+### Neutral Considerations
+
+- ADRs capture the _why_ behind a decision at a point in time; the codebase remains the source of truth for the _what_ and _how_.

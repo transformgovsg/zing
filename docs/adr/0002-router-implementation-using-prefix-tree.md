@@ -41,19 +41,18 @@ We chose to implement the router using a **prefix tree**, specifically a variant
 
 ## ⚖️ Consequences
 
-Choosing a Radix Tree structure for the router leads to the following outcomes:
+### Advantages
 
-- **Advantages 👍:**
+- **Lookup Performance:** Matching request pathnames is highly efficient (approaching O(k), where k is the path length), significantly faster than linear scans for large route sets, thanks to the prefix-sharing nature of the Radix Tree. This directly addresses the performance requirement from the context.
+- **Effective Pattern Support:** Handles static paths, dynamic parameters (`:param`), and catch-all parameters (`*param`) as required, meeting the pattern matching needs.
+- **Integrated Parameter Extraction:** The tree traversal mechanism naturally extracts values for dynamic and catch-all parameters during the lookup process.
+- **Method Isolation:** Separating routes by HTTP method into distinct trees provides clear organization.
 
-  - **Lookup Performance:** Matching request pathnames is highly efficient (approaching O(k), where k is the path length), significantly faster than linear scans for large route sets, thanks to the prefix-sharing nature of the Radix Tree. This directly addresses the performance requirement from the context.
-  - **Effective Pattern Support:** Handles static paths, dynamic parameters (`:param`), and catch-all parameters (`*param`) as required, meeting the pattern matching needs.
-  - **Integrated Parameter Extraction:** The tree traversal mechanism naturally extracts values for dynamic and catch-all parameters during the lookup process.
-  - **Method Isolation:** Separating routes by HTTP method into distinct trees provides clear organization.
+### Disadvantages
 
-- **Disadvantages 👎:**
+- **Implementation Complexity:** The logic for inserting routes, particularly handling node splits and prefix management inherent to Radix Trees, is more complex than simpler list-based routing approaches.
+- **Memory Footprint:** While prefix sharing reduces redundancy compared to storing full paths repeatedly, the tree structure itself (nodes, children pointers, fragments) can consume more memory than a flat list, especially for very diverse, non-overlapping routes.
 
-  - **Implementation Complexity:** The logic for inserting routes, particularly handling node splits and prefix management inherent to Radix Trees, is more complex than simpler list-based routing approaches.
-  - **Memory Footprint:** While prefix sharing reduces redundancy compared to storing full paths repeatedly, the tree structure itself (nodes, children pointers, fragments) can consume more memory than a flat list, especially for very diverse, non-overlapping routes.
+### Neutral Considerations
 
-- **Neutral Considerations 👀:**
-  - The actual real-world performance gain compared to other methods depends heavily on the specific structure, quantity, and degree of overlap among the registered routes.
+- The actual real-world performance gain compared to other methods depends heavily on the specific structure, quantity, and degree of overlap among the registered routes.
