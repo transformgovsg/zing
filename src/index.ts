@@ -22,5 +22,6 @@ export type {
   HTTPHeaderValue,
   HTTPMethod,
   JSONObject,
+  Middleware,
   MIME,
 } from './types.js';

@@ -8,7 +8,7 @@ import { HTTPStatusCode } from './http-status-code.js';
 import Request from './request.js';
 import Response from './response.js';
 import Router from './router.js';
-import type { ErrorHandler, Handler, HTTPMethod } from './types.js';
+import type { ErrorHandler, Handler, HTTPMethod, Middleware } from './types.js';
 
 /**
  * The default 404 handler.
@@ -149,15 +149,23 @@ export default class Zing {
   }
 
   /**
-   * Adds a route with the specified HTTP method, pattern and handler.
+   * Adds a route with the specified HTTP method, pattern, optional route-level
+   * middleware and handler.
    *
    * @param method - The HTTP method to add the route for.
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    *
    * @throws {Error} If the given pattern is invalid.
    */
-  route(method: HTTPMethod, pattern: string, handler: Handler) {
+  route(method: HTTPMethod, pattern: string, ...args: [...Middleware[], Handler]) {
+    let handler = args.at(-1) as Handler;
+    const middleware = args.slice(0, -1) as Middleware[];
+
+    for (let i = middleware.length - 1; i >= 0; i--) {
+      handler = middleware[i](handler);
+    }
+
     const result = this.#router.addRoute(method, pattern, { handler });
 
     if (result.isErr()) {
@@ -166,73 +174,80 @@ export default class Zing {
   }
 
   /**
-   * Adds a `GET` route with the specified pattern and handler.
+   * Adds a `GET` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  get(pattern: string, handler: Handler) {
-    this.route('GET', pattern, handler);
+  get(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('GET', pattern, ...args);
   }
 
   /**
-   * Adds a `HEAD` route with the specified pattern and handler.
+   * Adds a `HEAD` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  head(pattern: string, handler: Handler) {
-    this.route('HEAD', pattern, handler);
+  head(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('HEAD', pattern, ...args);
   }
 
   /**
-   * Adds a `PATCH` route with the specified pattern and handler.
+   * Adds a `PATCH` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  patch(pattern: string, handler: Handler) {
-    this.route('PATCH', pattern, handler);
+  patch(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('PATCH', pattern, ...args);
   }
 
   /**
-   * Adds a `POST` route with the specified pattern and handler.
+   * Adds a `POST` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  post(pattern: string, handler: Handler) {
-    this.route('POST', pattern, handler);
+  post(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('POST', pattern, ...args);
   }
 
   /**
-   * Adds a `PUT` route with the specified pattern and handler.
+   * Adds a `PUT` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  put(pattern: string, handler: Handler) {
-    this.route('PUT', pattern, handler);
+  put(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('PUT', pattern, ...args);
   }
 
   /**
-   * Adds a `DELETE` route with the specified pattern and handler.
+   * Adds a `DELETE` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  delete(pattern: string, handler: Handler) {
-    this.route('DELETE', pattern, handler);
+  delete(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('DELETE', pattern, ...args);
   }
 
   /**
-   * Adds a `OPTIONS` route with the specified pattern and handler.
+   * Adds a `OPTIONS` route with the specified pattern, optional route-level
+   * middleware and handler.
    *
    * @param pattern - The pattern to match the route against.
-   * @param handler - The handler to call when the route is matched.
+   * @param args - The middleware and handler to call when the route is matched.
    */
-  options(pattern: string, handler: Handler) {
-    this.route('OPTIONS', pattern, handler);
+  options(pattern: string, ...args: [...Middleware[], Handler]) {
+    this.route('OPTIONS', pattern, ...args);
   }
 
   /**

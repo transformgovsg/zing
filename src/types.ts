@@ -42,3 +42,4 @@ export interface JSONObject {
 
 export type Handler = (req: Request, res: Response) => Promise<void> | void;
 export type ErrorHandler = (err: unknown, req: Request, res: Response) => Promise<void> | void;
+export type Middleware = (next: Handler) => Handler;

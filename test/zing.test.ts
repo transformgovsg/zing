@@ -1,5 +1,5 @@
 import { HTTPStatusCode } from '../src/http-status-code.js';
-import type { ErrorHandler, Handler, HTTPMethod } from '../src/types.js';
+import type { ErrorHandler, Handler, HTTPMethod, Middleware } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Zing', (ctx) => {
@@ -16,6 +16,59 @@ describeMatrix('Zing', (ctx) => {
         const res = await ctx.request(method, '/');
 
         expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(await res.text()).toBe('');
+      },
+    );
+
+    test.each<HTTPMethod>(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])(
+      'adds a route for the method `%s` with middleware',
+      async (method) => {
+        let order = '';
+
+        const mh1 = vi.fn<Handler>();
+        const middleware1: Middleware = (next) => {
+          return mh1.mockImplementation(async (req, res) => {
+            order += '1';
+            await next(req, res);
+            order += '1';
+          });
+        };
+
+        const mh2 = vi.fn<Handler>();
+        const middleware2: Middleware = (next) => {
+          return mh2.mockImplementation(async (req, res) => {
+            order += '2';
+            await next(req, res);
+            order += '2';
+          });
+        };
+
+        const mh3 = vi.fn<Handler>();
+        const middleware3: Middleware = (next) => {
+          return mh3.mockImplementation(async (req, res) => {
+            order += '3';
+            await next(req, res);
+            order += '3';
+          });
+        };
+
+        const handler = vi.fn<Handler>((_, res) => {
+          order += '4';
+          res.ok();
+        });
+
+        ctx.app.route(method, '/', middleware1, middleware2, middleware3, handler);
+
+        const res = await ctx.request(method, '/');
+
+        expect(mh1).toHaveBeenCalled();
+        expect(mh2).toHaveBeenCalled();
+        expect(mh3).toHaveBeenCalled();
+        expect(handler).toHaveBeenCalled();
+
+        expect(order).toBe('1234321');
 
         expect(res.status).toBe(200);
         expect(await res.text()).toBe('');
@@ -38,6 +91,56 @@ describeMatrix('Zing', (ctx) => {
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
     });
+
+    test('adds a route for the `GET` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.get('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('GET', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
   });
 
   describe('head()', () => {
@@ -51,6 +154,56 @@ describeMatrix('Zing', (ctx) => {
       const res = await ctx.request('HEAD', '/');
 
       expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
+
+    test('adds a route for the `HEAD` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.head('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('HEAD', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
 
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
@@ -72,6 +225,56 @@ describeMatrix('Zing', (ctx) => {
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
     });
+
+    test('adds a route for the `PATCH` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.patch('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('PATCH', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
   });
 
   describe('post()', () => {
@@ -85,6 +288,56 @@ describeMatrix('Zing', (ctx) => {
       const res = await ctx.request('POST', '/');
 
       expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
+
+    test('adds a route for the `POST` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.post('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('POST', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
 
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
@@ -106,6 +359,56 @@ describeMatrix('Zing', (ctx) => {
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
     });
+
+    test('adds a route for the `PUT` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.put('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('PUT', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
   });
 
   describe('delete()', () => {
@@ -123,6 +426,56 @@ describeMatrix('Zing', (ctx) => {
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
     });
+
+    test('adds a route for the `DELETE` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.delete('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('DELETE', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
   });
 
   describe('options()', () => {
@@ -136,6 +489,56 @@ describeMatrix('Zing', (ctx) => {
       const res = await ctx.request('OPTIONS', '/');
 
       expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
+
+    test('adds a route for the `OPTIONS` method with middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.options('/', middleware1, middleware2, middleware3, handler);
+
+      const res = await ctx.request('OPTIONS', '/');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
 
       expect(res.status).toBe(200);
       expect(await res.text()).toBe('');
