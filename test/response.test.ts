@@ -1,10 +1,10 @@
-import type { RouteHandler } from '../src/types.js';
+import type { Handler } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Response', (ctx) => {
   describe('status()', () => {
     test('responds with the status code', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.status(400);
       });
 
@@ -17,7 +17,7 @@ describeMatrix('Response', (ctx) => {
     });
 
     test('does not overwrite the status code if the response has already been sent', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.status(400);
         res.status(401);
       });
@@ -33,7 +33,7 @@ describeMatrix('Response', (ctx) => {
 
   describe('ok()', () => {
     test('responds with a `200` status code', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -48,7 +48,7 @@ describeMatrix('Response', (ctx) => {
 
   describe('header()', () => {
     test('sets the header', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.header('x-foo', 'bar');
 
         res.ok();
@@ -64,7 +64,7 @@ describeMatrix('Response', (ctx) => {
     });
 
     test('overwrites the header with the latest value of the same key', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.header('x-foo', 'bar');
         res.header('x-foo', 'qux');
 
@@ -81,7 +81,7 @@ describeMatrix('Response', (ctx) => {
     });
 
     test('does not overwrite the header with the latest value if the response has already been sent', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.header('x-foo', 'bar');
 
         res.ok();
@@ -101,7 +101,7 @@ describeMatrix('Response', (ctx) => {
 
   describe('json()', () => {
     test('sends a JSON response', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.json(200, {
           hello: 'world',
           foo: 123,
@@ -124,7 +124,7 @@ describeMatrix('Response', (ctx) => {
     });
 
     test('sends only the status code if the request method is `HEAD`', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.json(200, {
           hello: 'world',
           foo: 123,
@@ -147,7 +147,7 @@ describeMatrix('Response', (ctx) => {
 
   describe('text()', () => {
     test('sends a text response', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.text(200, 'hello');
       });
 
@@ -163,7 +163,7 @@ describeMatrix('Response', (ctx) => {
     });
 
     test('sends only the status code if the request method is `HEAD`', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.text(200, 'hello');
       });
 

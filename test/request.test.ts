@@ -1,4 +1,4 @@
-import type { HTTPMethod, RouteHandler } from '../src/types.js';
+import type { Handler, HTTPMethod } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Request', (ctx) => {
@@ -6,7 +6,7 @@ describeMatrix('Request', (ctx) => {
     test('returns the protocol', async () => {
       let actualProtocol: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         actualProtocol = req.protocol;
 
         res.ok();
@@ -26,7 +26,7 @@ describeMatrix('Request', (ctx) => {
     test('returns the pathname', async () => {
       let actualPathname: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         actualPathname = req.pathname;
 
         res.ok();
@@ -48,7 +48,7 @@ describeMatrix('Request', (ctx) => {
       async (method) => {
         let actualMethod: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualMethod = req.method;
 
           res.ok();
@@ -70,7 +70,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the value', async () => {
         let actualValue: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           req.set('foo', 'bar');
           actualValue = req.get('foo');
 
@@ -89,7 +89,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the value even if the default value is provided', async () => {
         let actualValue: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           req.set('foo', 'bar');
           actualValue = req.get('foo', 'qux');
 
@@ -110,7 +110,7 @@ describeMatrix('Request', (ctx) => {
       test('returns `null` if no default value is provided', async () => {
         let actualValue: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualValue = req.get('foo');
 
           res.ok();
@@ -128,7 +128,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the default value if it is provided', async () => {
         let actualValue: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualValue = req.get('foo', 'bar');
 
           res.ok();
@@ -149,7 +149,7 @@ describeMatrix('Request', (ctx) => {
     test('removes the key if the value is `undefined`', async () => {
       let actualValue: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         req.set('foo', 'bar');
         req.set('foo', undefined);
         actualValue = req.get('foo');
@@ -169,7 +169,7 @@ describeMatrix('Request', (ctx) => {
     test('removes the key if the value is `null`', async () => {
       let actualValue: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         req.set('foo', 'bar');
         req.set('foo', null);
         actualValue = req.get('foo');
@@ -192,7 +192,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the parameter value', async () => {
         let actualParam: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualParam = req.param('foo');
 
           res.ok();
@@ -210,7 +210,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the parameter value even if the default value is provided', async () => {
         let actualParam: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualParam = req.param('foo', 'qux');
 
           res.ok();
@@ -230,7 +230,7 @@ describeMatrix('Request', (ctx) => {
       test('returns `null` if no default value is provided', async () => {
         let actualParam: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualParam = req.param('foo');
 
           res.ok();
@@ -248,7 +248,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the default value if it is provided', async () => {
         let actualParam: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualParam = req.param('foo', 'bar');
 
           res.ok();
@@ -270,7 +270,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the query value', async () => {
         let actualQuery: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQuery = req.query('foo');
 
           res.ok();
@@ -288,7 +288,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the query value even if the default value is provided', async () => {
         let actualQuery: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQuery = req.query('foo', 'qux');
 
           res.ok();
@@ -308,7 +308,7 @@ describeMatrix('Request', (ctx) => {
       test('returns `null` if no default value is provided', async () => {
         let actualQuery: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQuery = req.query('foo');
 
           res.ok();
@@ -326,7 +326,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the default value if it is provided', async () => {
         let actualQuery: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQuery = req.query('foo', 'bar');
 
           res.ok();
@@ -345,7 +345,7 @@ describeMatrix('Request', (ctx) => {
     test('returns the value of the first occurrence of the query name', async () => {
       let actualQuery: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         actualQuery = req.query('foo');
 
         res.ok();
@@ -366,7 +366,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the query values', async () => {
         let actualQueries: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQueries = req.queries('foo');
 
           res.ok();
@@ -384,7 +384,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the query values even if the default value is provided', async () => {
         let actualQueries: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQueries = req.queries('foo', ['qux', '123']);
 
           res.ok();
@@ -404,7 +404,7 @@ describeMatrix('Request', (ctx) => {
       test('returns `null` if no default value is provided', async () => {
         let actualQueries: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQueries = req.queries('foo');
 
           res.ok();
@@ -422,7 +422,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the default value if it is provided', async () => {
         let actualQueries: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualQueries = req.queries('foo', ['bar', 'qux']);
 
           res.ok();
@@ -444,7 +444,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the header value', async () => {
         let actualHeader: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualHeader = req.header('foo');
 
           res.ok();
@@ -466,7 +466,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the header value even if it is an array', async () => {
         let actualHeader: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualHeader = req.header('foo', 'qux');
 
           res.ok();
@@ -490,7 +490,7 @@ describeMatrix('Request', (ctx) => {
       test('returns `null` if no default value is provided', async () => {
         let actualHeader: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualHeader = req.header('foo');
 
           res.ok();
@@ -508,7 +508,7 @@ describeMatrix('Request', (ctx) => {
       test('returns the default value if it is provided', async () => {
         let actualHeader: unknown;
 
-        const handler = vi.fn<RouteHandler>((req, res) => {
+        const handler = vi.fn<Handler>((req, res) => {
           actualHeader = req.header('foo', 'bar');
 
           res.ok();
@@ -527,7 +527,7 @@ describeMatrix('Request', (ctx) => {
     test('combines the values of the `set-cookie` header', async () => {
       let actualHeader: unknown;
 
-      const handler = vi.fn<RouteHandler>((req, res) => {
+      const handler = vi.fn<Handler>((req, res) => {
         actualHeader = req.header('set-cookie');
 
         res.ok();
@@ -553,7 +553,7 @@ describeMatrix('Request', (ctx) => {
       async (method) => {
         let actualBody: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.body();
           actualBody = result.unwrap();
 
@@ -584,7 +584,7 @@ describeMatrix('Request', (ctx) => {
         async () => {
           let actualBody: unknown;
 
-          const handler = vi.fn<RouteHandler>(async (req, res) => {
+          const handler = vi.fn<Handler>(async (req, res) => {
             const result = await req.body();
             actualBody = result.unwrap();
 
@@ -612,7 +612,7 @@ describeMatrix('Request', (ctx) => {
       async (method) => {
         let actualText: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.text();
           actualText = result.unwrap();
 
@@ -644,7 +644,7 @@ describeMatrix('Request', (ctx) => {
         async () => {
           let actualText: unknown;
 
-          const handler = vi.fn<RouteHandler>(async (req, res) => {
+          const handler = vi.fn<Handler>(async (req, res) => {
             const result = await req.text();
             actualText = result.unwrap();
 
@@ -670,7 +670,7 @@ describeMatrix('Request', (ctx) => {
       test('responds with a `415` status code', async () => {
         let actualText: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.text();
           actualText = result.unwrap();
 
@@ -698,7 +698,7 @@ describeMatrix('Request', (ctx) => {
       async (method) => {
         let actualJSON: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.json();
           actualJSON = result.unwrap();
 
@@ -730,7 +730,7 @@ describeMatrix('Request', (ctx) => {
         async () => {
           let actualJSON: unknown;
 
-          const handler = vi.fn<RouteHandler>(async (req, res) => {
+          const handler = vi.fn<Handler>(async (req, res) => {
             const result = await req.json();
             actualJSON = result.unwrap();
 
@@ -756,7 +756,7 @@ describeMatrix('Request', (ctx) => {
       test('responds with a `415` status code', async () => {
         let actualJSON: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.json();
           actualJSON = result.unwrap();
 
@@ -781,7 +781,7 @@ describeMatrix('Request', (ctx) => {
       test('responds with a `422` status code', async () => {
         let actualJSON: unknown;
 
-        const handler = vi.fn<RouteHandler>(async (req, res) => {
+        const handler = vi.fn<Handler>(async (req, res) => {
           const result = await req.json();
           actualJSON = result.unwrap();
 

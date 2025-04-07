@@ -1,5 +1,5 @@
 import { HTTPStatusCode } from '../src/http-status-code.js';
-import type { ErrorHandler, HTTPMethod, RouteHandler } from '../src/types.js';
+import type { ErrorHandler, Handler, HTTPMethod } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Zing', (ctx) => {
@@ -7,7 +7,7 @@ describeMatrix('Zing', (ctx) => {
     test.each<HTTPMethod>(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])(
       'adds a route for the method `%s`',
       async (method) => {
-        const handler = vi.fn<RouteHandler>((_, res) => {
+        const handler = vi.fn<Handler>((_, res) => {
           res.ok();
         });
 
@@ -25,7 +25,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('get()', () => {
     test('adds a route for the `GET` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -42,7 +42,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('head()', () => {
     test('adds a route for the `HEAD` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -59,7 +59,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('patch()', () => {
     test('adds a route for the `PATCH` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -76,7 +76,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('post()', () => {
     test('adds a route for the `POST` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -93,7 +93,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('put()', () => {
     test('adds a route for the `PUT` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -110,7 +110,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('delete()', () => {
     test('adds a route for the `DELETE` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -127,7 +127,7 @@ describeMatrix('Zing', (ctx) => {
 
   describe('options()', () => {
     test('adds a route for the `OPTIONS` method', async () => {
-      const handler = vi.fn<RouteHandler>((_, res) => {
+      const handler = vi.fn<Handler>((_, res) => {
         res.ok();
       });
 
@@ -166,7 +166,7 @@ describeMatrix('Zing', (ctx) => {
       test.each<HTTPMethod>(['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'])(
         '(%s) responds with a `404` status',
         async (method) => {
-          const handler = vi.fn<RouteHandler>((_, res) => {
+          const handler = vi.fn<Handler>((_, res) => {
             res.json(HTTPStatusCode.NotFound, { message: 'This is a custom 404 handler.' });
           });
 
@@ -182,7 +182,7 @@ describeMatrix('Zing', (ctx) => {
       );
 
       test('(HEAD) responds with a `404` status', async () => {
-        const handler = vi.fn<RouteHandler>((_, res) => {
+        const handler = vi.fn<Handler>((_, res) => {
           res.json(HTTPStatusCode.NotFound, { message: 'Not found' });
         });
 
@@ -203,7 +203,7 @@ describeMatrix('Zing', (ctx) => {
       test.each<HTTPMethod>(['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'])(
         '(%s) responds with a `500` status',
         async (method) => {
-          const handler = vi.fn<RouteHandler>(() => {
+          const handler = vi.fn<Handler>(() => {
             throw new Error('Kaboom!');
           });
 
@@ -220,7 +220,7 @@ describeMatrix('Zing', (ctx) => {
       );
 
       test('(HEAD) responds with a `500` status', async () => {
-        const handler = vi.fn<RouteHandler>(() => {
+        const handler = vi.fn<Handler>(() => {
           throw new Error('Kaboom!');
         });
 
@@ -240,7 +240,7 @@ describeMatrix('Zing', (ctx) => {
       test.each<HTTPMethod>(['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'])(
         '(%s) responds with a `500` status',
         async (method) => {
-          const handler = vi.fn<RouteHandler>(() => {
+          const handler = vi.fn<Handler>(() => {
             throw new Error('Kaboom!');
           });
 
@@ -266,7 +266,7 @@ describeMatrix('Zing', (ctx) => {
       );
 
       test('(HEAD) responds with a `500` status', async () => {
-        const handler = vi.fn<RouteHandler>(() => {
+        const handler = vi.fn<Handler>(() => {
           throw new Error('Kaboom!');
         });
 
@@ -295,7 +295,7 @@ describeMatrix('Zing', (ctx) => {
       test.each<HTTPMethod>(['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'])(
         '(%s) responds with a `500` status',
         async (method) => {
-          const handler = vi.fn<RouteHandler>(() => {
+          const handler = vi.fn<Handler>(() => {
             throw new Error('Kaboom!');
           });
 
@@ -319,7 +319,7 @@ describeMatrix('Zing', (ctx) => {
       );
 
       test('(HEAD) responds with a `500` status', async () => {
-        const handler = vi.fn<RouteHandler>(() => {
+        const handler = vi.fn<Handler>(() => {
           throw new Error('Kaboom!');
         });
 

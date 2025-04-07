@@ -8,12 +8,12 @@ import { HTTPStatusCode } from './http-status-code.js';
 import Request from './request.js';
 import Response from './response.js';
 import Router from './router.js';
-import type { ErrorHandler, HTTPMethod, RouteHandler } from './types.js';
+import type { ErrorHandler, Handler, HTTPMethod } from './types.js';
 
 /**
  * The default 404 handler.
  */
-const DEFAULT_404_HANDLER: RouteHandler = (_, res) => {
+const DEFAULT_404_HANDLER: Handler = (_, res) => {
   res.text(HTTPStatusCode.NotFound, 'Not Found');
 };
 
@@ -47,11 +47,11 @@ export default class Zing {
   #isListening = false;
   #isShuttingDown = false;
   #activeRequestCountPerSocket = new Map<Socket, number>();
-  #fn404Handler: RouteHandler = DEFAULT_404_HANDLER;
+  #fn404Handler: Handler = DEFAULT_404_HANDLER;
   #fnErrorHandler: ErrorHandler = DEFAULT_ERROR_HANDLER;
 
   #server: HTTPServer;
-  #router: Router<{ handler: RouteHandler }>;
+  #router: Router<{ handler: Handler }>;
 
   constructor() {
     this.#server = createHTTPServer(this.#dispatch.bind(this));
@@ -157,7 +157,7 @@ export default class Zing {
    *
    * @throws {Error} If the given pattern is invalid.
    */
-  route(method: HTTPMethod, pattern: string, handler: RouteHandler) {
+  route(method: HTTPMethod, pattern: string, handler: Handler) {
     const result = this.#router.addRoute(method, pattern, { handler });
 
     if (result.isErr()) {
@@ -171,7 +171,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  get(pattern: string, handler: RouteHandler) {
+  get(pattern: string, handler: Handler) {
     this.route('GET', pattern, handler);
   }
 
@@ -181,7 +181,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  head(pattern: string, handler: RouteHandler) {
+  head(pattern: string, handler: Handler) {
     this.route('HEAD', pattern, handler);
   }
 
@@ -191,7 +191,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  patch(pattern: string, handler: RouteHandler) {
+  patch(pattern: string, handler: Handler) {
     this.route('PATCH', pattern, handler);
   }
 
@@ -201,7 +201,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  post(pattern: string, handler: RouteHandler) {
+  post(pattern: string, handler: Handler) {
     this.route('POST', pattern, handler);
   }
 
@@ -211,7 +211,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  put(pattern: string, handler: RouteHandler) {
+  put(pattern: string, handler: Handler) {
     this.route('PUT', pattern, handler);
   }
 
@@ -221,7 +221,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  delete(pattern: string, handler: RouteHandler) {
+  delete(pattern: string, handler: Handler) {
     this.route('DELETE', pattern, handler);
   }
 
@@ -231,7 +231,7 @@ export default class Zing {
    * @param pattern - The pattern to match the route against.
    * @param handler - The handler to call when the route is matched.
    */
-  options(pattern: string, handler: RouteHandler) {
+  options(pattern: string, handler: Handler) {
     this.route('OPTIONS', pattern, handler);
   }
 
@@ -240,7 +240,7 @@ export default class Zing {
    *
    * @param handler - The handler to call when a route is not found.
    */
-  set404Handler(handler: RouteHandler) {
+  set404Handler(handler: Handler) {
     this.#fn404Handler = handler;
   }
 

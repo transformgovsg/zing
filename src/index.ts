@@ -16,11 +16,11 @@ export { default as Response } from './response.js';
 // Types.
 export type {
   ErrorHandler,
+  Handler,
   HTTPHeaderKey,
   HTTPHeaders,
   HTTPHeaderValue,
   HTTPMethod,
   JSONObject,
   MIME,
-  RouteHandler,
 } from './types.js';
