@@ -12,7 +12,7 @@ describeMatrix('Request', (ctx) => {
         res.ok();
       });
 
-      ctx.app.addRoute('GET', '/protocol', handler);
+      ctx.app.route('GET', '/protocol', handler);
 
       const res = await ctx.request('GET', '/protocol');
 
@@ -54,7 +54,7 @@ describeMatrix('Request', (ctx) => {
           res.ok();
         });
 
-        ctx.app.addRoute(method, `/${method}`, handler);
+        ctx.app.route(method, `/${method}`, handler);
 
         const res = await ctx.request(method, `/${method}`);
 
@@ -560,7 +560,7 @@ describeMatrix('Request', (ctx) => {
           res.ok();
         });
 
-        ctx.app.addRoute(method, '/body', handler);
+        ctx.app.route(method, '/body', handler);
 
         const res = await ctx.request(method, '/body', {
           body: 'foobar',
@@ -619,7 +619,7 @@ describeMatrix('Request', (ctx) => {
           res.ok();
         });
 
-        ctx.app.addRoute(method, '/text', handler);
+        ctx.app.route(method, '/text', handler);
 
         const res = await ctx.request(method, '/text', {
           body: 'foobar',
@@ -705,7 +705,7 @@ describeMatrix('Request', (ctx) => {
           res.ok();
         });
 
-        ctx.app.addRoute(method, '/json', handler);
+        ctx.app.route(method, '/json', handler);
 
         const res = await ctx.request(method, '/json', {
           body: { foo: 'bar' },
