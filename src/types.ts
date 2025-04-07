@@ -33,12 +33,12 @@ export type HTTPHeaders = {
   [Key in HTTPHeaderKey]?: HTTPHeaderValue<Key>;
 };
 
-export type RouteHandler = (req: Request, res: Response) => Promise<void> | void;
-export type ErrorHandler = (err: unknown, req: Request, res: Response) => Promise<void> | void;
-
 type JSONPrimitive = string | number | boolean | null | Date;
 type JSONValue = JSONPrimitive | JSONValue[] | JSONObject;
 
 export interface JSONObject {
   [key: string]: JSONValue;
 }
+
+export type Handler = (req: Request, res: Response) => Promise<void> | void;
+export type ErrorHandler = (err: unknown, req: Request, res: Response) => Promise<void> | void;
