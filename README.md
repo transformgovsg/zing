@@ -62,7 +62,7 @@ process.on('SIGINT', async () => {
 
 - [Zing.listen()](#zinglisten)
 - [Zing.shutdown()](#zingshutdown)
-- [Zing.addRoute()](#zingaddroute)
+- [Zing.route()](#zingroute)
 - [Zing.get()](#zingget)
 - [Zing.head()](#zinghead)
 - [Zing.patch()](#zingpatch)
@@ -139,14 +139,14 @@ await app.shutdown(5000); // Shutdown the server after 5 seconds.
 
 [⬆️ Back to top](#-api)
 
-### Zing.addRoute()
+### Zing.route()
 
 Adds a route to the server.
 
 **Type**
 
 ```ts
-addRoute(method: 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS', pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+route(method: 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS', pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
 ```
 
 **Parameters**
@@ -162,7 +162,7 @@ addRoute(method: 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS
 **Example**
 
 ```ts
-app.addRoute('GET', '/', (req, res) => {
+app.route('GET', '/', (req, res) => {
   res.ok();
 });
 ```

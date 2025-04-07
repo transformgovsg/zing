@@ -3,7 +3,7 @@ import type { ErrorHandler, HTTPMethod, RouteHandler } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Zing', (ctx) => {
-  describe('addRoute()', () => {
+  describe('route()', () => {
     test.each<HTTPMethod>(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])(
       'adds a route for the method `%s`',
       async (method) => {
@@ -11,7 +11,7 @@ describeMatrix('Zing', (ctx) => {
           res.ok();
         });
 
-        ctx.app.addRoute(method, '/', handler);
+        ctx.app.route(method, '/', handler);
 
         const res = await ctx.request(method, '/');
 
@@ -207,7 +207,7 @@ describeMatrix('Zing', (ctx) => {
             throw new Error('Kaboom!');
           });
 
-          ctx.app.addRoute(method, '/kaboom', handler);
+          ctx.app.route(method, '/kaboom', handler);
 
           const res = await ctx.request(method, '/kaboom');
 
@@ -244,7 +244,7 @@ describeMatrix('Zing', (ctx) => {
             throw new Error('Kaboom!');
           });
 
-          ctx.app.addRoute(method, '/kaboom', handler);
+          ctx.app.route(method, '/kaboom', handler);
 
           const errorHandler = vi.fn<ErrorHandler>((_err, _req, res) => {
             res.json(HTTPStatusCode.InternalServerError, {
@@ -299,7 +299,7 @@ describeMatrix('Zing', (ctx) => {
             throw new Error('Kaboom!');
           });
 
-          ctx.app.addRoute(method, '/kaboom', handler);
+          ctx.app.route(method, '/kaboom', handler);
 
           const errorHandler = vi.fn<ErrorHandler>(() => {
             throw new Error('Kaboom again!');

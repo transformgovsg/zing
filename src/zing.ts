@@ -157,7 +157,7 @@ export default class Zing {
    *
    * @throws {Error} If the given pattern is invalid.
    */
-  addRoute(method: HTTPMethod, pattern: string, handler: RouteHandler) {
+  route(method: HTTPMethod, pattern: string, handler: RouteHandler) {
     const result = this.#router.addRoute(method, pattern, { handler });
 
     if (result.isErr()) {
@@ -172,7 +172,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   get(pattern: string, handler: RouteHandler) {
-    this.addRoute('GET', pattern, handler);
+    this.route('GET', pattern, handler);
   }
 
   /**
@@ -182,7 +182,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   head(pattern: string, handler: RouteHandler) {
-    this.addRoute('HEAD', pattern, handler);
+    this.route('HEAD', pattern, handler);
   }
 
   /**
@@ -192,7 +192,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   patch(pattern: string, handler: RouteHandler) {
-    this.addRoute('PATCH', pattern, handler);
+    this.route('PATCH', pattern, handler);
   }
 
   /**
@@ -202,7 +202,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   post(pattern: string, handler: RouteHandler) {
-    this.addRoute('POST', pattern, handler);
+    this.route('POST', pattern, handler);
   }
 
   /**
@@ -212,7 +212,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   put(pattern: string, handler: RouteHandler) {
-    this.addRoute('PUT', pattern, handler);
+    this.route('PUT', pattern, handler);
   }
 
   /**
@@ -222,7 +222,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   delete(pattern: string, handler: RouteHandler) {
-    this.addRoute('DELETE', pattern, handler);
+    this.route('DELETE', pattern, handler);
   }
 
   /**
@@ -232,7 +232,7 @@ export default class Zing {
    * @param handler - The handler to call when the route is matched.
    */
   options(pattern: string, handler: RouteHandler) {
-    this.addRoute('OPTIONS', pattern, handler);
+    this.route('OPTIONS', pattern, handler);
   }
 
   /**
