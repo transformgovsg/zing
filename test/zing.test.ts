@@ -545,6 +545,59 @@ describeMatrix('Zing', (ctx) => {
     });
   });
 
+  describe('use()', () => {
+    test('adds a middleware', async () => {
+      let order = '';
+
+      const mh1 = vi.fn<Handler>();
+      const middleware1: Middleware = (next) => {
+        return mh1.mockImplementation(async (req, res) => {
+          order += '1';
+          await next(req, res);
+          order += '1';
+        });
+      };
+
+      const mh2 = vi.fn<Handler>();
+      const middleware2: Middleware = (next) => {
+        return mh2.mockImplementation(async (req, res) => {
+          order += '2';
+          await next(req, res);
+          order += '2';
+        });
+      };
+
+      const mh3 = vi.fn<Handler>();
+      const middleware3: Middleware = (next) => {
+        return mh3.mockImplementation(async (req, res) => {
+          order += '3';
+          await next(req, res);
+          order += '3';
+        });
+      };
+
+      const handler = vi.fn<Handler>((_, res) => {
+        order += '4';
+        res.ok();
+      });
+
+      ctx.app.use(middleware1, middleware2, middleware3);
+      ctx.app.get('/middleware', handler);
+
+      const res = await ctx.request('GET', '/middleware');
+
+      expect(mh1).toHaveBeenCalled();
+      expect(mh2).toHaveBeenCalled();
+      expect(mh3).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalled();
+
+      expect(order).toBe('1234321');
+
+      expect(res.status).toBe(200);
+      expect(await res.text()).toBe('');
+    });
+  });
+
   describe('set404Handler()', () => {
     describe('default 404 handler', () => {
       test.each<HTTPMethod>(['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'OPTIONS'])(

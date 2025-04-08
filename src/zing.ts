@@ -47,6 +47,7 @@ export default class Zing {
   #isListening = false;
   #isShuttingDown = false;
   #activeRequestCountPerSocket = new Map<Socket, number>();
+  #middleware: Middleware[] = [];
   #fn404Handler: Handler = DEFAULT_404_HANDLER;
   #fnErrorHandler: ErrorHandler = DEFAULT_ERROR_HANDLER;
 
@@ -251,6 +252,16 @@ export default class Zing {
   }
 
   /**
+   * Adds a middleware to be called for each incoming request regardless of
+   * whether it matches a route or not.
+   *
+   * @param middleware - The middleware to be called for each request.
+   */
+  use(...middleware: Middleware[]) {
+    this.#middleware.push(...middleware);
+  }
+
+  /**
    * Sets the handler to call when a route is not found.
    *
    * @param handler - The handler to call when a route is not found.
@@ -274,14 +285,16 @@ export default class Zing {
 
     try {
       const route = this.#router.findRoute(req.method, req.pathname);
-      if (!route) {
-        await this.#fn404Handler(req, res);
-        return;
+      if (route) {
+        req.set('_params', route.params);
       }
 
-      req.set('_params', route.params);
+      let handler = route ? route.data.handler : this.#fn404Handler;
+      for (let i = this.#middleware.length - 1; i >= 0; i--) {
+        handler = this.#middleware[i](handler);
+      }
 
-      await route.data.handler(req, res);
+      await handler(req, res);
     } catch (err) {
       try {
         await this.#fnErrorHandler(err, req, res);
