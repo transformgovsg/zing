@@ -252,8 +252,8 @@ export default class Zing {
   }
 
   /**
-   * Adds a middleware to be called for each incoming request regardless of
-   * whether it matches a route or not.
+   * Adds an application-level middleware to be called for each incoming
+   * request regardless of whether it matches a route or not.
    *
    * @param middleware - The middleware to be called for each request.
    */
