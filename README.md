@@ -5,7 +5,7 @@ A lightweight HTTP framework for **Node.js**.
 ## 🚧 Roadmap
 
 - [ ] Cookies
-- [ ] Middleware
+- [x] ~~Middleware~~
 - [ ] Server-sent events
 - [ ] Header, query, and body schema validation
 
@@ -70,6 +70,7 @@ process.on('SIGINT', async () => {
 - [Zing.put()](#zingput)
 - [Zing.delete()](#zingdelete)
 - [Zing.options()](#zingoptions)
+- [Zing.use()](#zinguse)
 - [Zing.set404Handler()](#zingset404handler)
 - [Zing.setErrorHandler()](#zingseterrorhandler)
 - [Request.node](#requestnode)
@@ -95,7 +96,7 @@ process.on('SIGINT', async () => {
 
 ### Zing.listen()
 
-Starts the server and listens on the given port for incoming requests.
+Starts the HTTP server and listens on the given port for incoming requests.
 
 **Type**
 
@@ -118,7 +119,7 @@ await app.listen(8123); // Listen on port 8123.
 
 ### Zing.shutdown()
 
-Shuts down the server.
+Shuts down the HTTP server.
 
 **Type**
 
@@ -128,32 +129,32 @@ shutdown(timeout?: number): Promise<void>;
 
 **Parameters**
 
-- `timeout` - The time in milliseconds to wait for active requests to finish before forcefully shutting down the server. Default: `10000`.
+- `timeout` - The time in milliseconds to wait for active requests to finish before forcefully shutting down the HTTP server. Default: `10000`.
 
 **Example**
 
 ```ts
-await app.shutdown(); // Shutdown the server after 10 seconds.
-await app.shutdown(5000); // Shutdown the server after 5 seconds.
+await app.shutdown(); // Shutdown the HTTP server after 10 seconds.
+await app.shutdown(5000); // Shutdown the HTTP server after 5 seconds.
 ```
 
 [⬆️ Back to top](#-api)
 
 ### Zing.route()
 
-Adds a route to the server.
+Adds a route to the application.
 
 **Type**
 
 ```ts
-route(method: 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS', pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+route(method: 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS', pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `method` - The HTTP method to match against the request method.
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -167,22 +168,37 @@ app.route('GET', '/', (req, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.route('GET', '/', logger, (req, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.get()
 
-Adds a `GET` route to the server.
+Adds a `GET` route to the application.
 
 **Type**
 
 ```ts
-get(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+get(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -196,22 +212,37 @@ app.get('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.get('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.head()
 
-Adds a `HEAD` route to the server.
+Adds a `HEAD` route to the application.
 
 **Type**
 
 ```ts
-head(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+head(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -225,22 +256,37 @@ app.head('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.head('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.patch()
 
-Adds a `PATCH` route to the server.
+Adds a `PATCH` route to the application.
 
 **Type**
 
 ```ts
-patch(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+patch(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -254,22 +300,37 @@ app.patch('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.patch('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.post()
 
-Adds a `POST` route to the server.
+Adds a `POST` route to the application.
 
 **Type**
 
 ```ts
-post(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+post(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -283,22 +344,37 @@ app.post('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.post('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.put()
 
-Adds a `PUT` route to the server.
+Adds a `PUT` route to the application.
 
 **Type**
 
 ```ts
-put(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+put(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -312,22 +388,37 @@ app.put('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.put('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.delete()
 
-Adds a `DELETE` route to the server.
+Adds a `DELETE` route to the application.
 
 **Type**
 
 ```ts
-delete(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+delete(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -341,22 +432,37 @@ app.delete('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.delete('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.options()
 
-Adds a `OPTIONS` route to the server.
+Adds a `OPTIONS` route to the application.
 
 **Type**
 
 ```ts
-options(pattern: string, handler: (req: Request, res: Response) => Promise<void> |void): void;
+options(pattern: string, ...args: [...Middleware[], Handler]): void;
 ```
 
 **Parameters**
 
 - `pattern` - The pattern to match against the request pathname.
-- `handler` - The handler to call when the route is matched.
+- `args` - The middleware and handler to call when the route is matched.
 
 **Throws**
 
@@ -370,6 +476,63 @@ app.options('/', (_, res) => {
 });
 ```
 
+With middleware:
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.options('/', logger, (_, res) => {
+  res.ok();
+});
+```
+
+[⬆️ Back to top](#-api)
+
+### Zing.use()
+
+Adds an application-level middleware to be called for each incoming request regardless of whether it matches a route or not.
+
+**Type**
+
+```ts
+use(...middleware: Middleware[]): void;
+```
+
+**Parameters**
+
+- `middleware` - The middleware to be called for each request.
+
+**Example**
+
+```ts
+function logger(next: Handler) {
+  return async (req, res) => {
+    console.log(`${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.use(logger);
+```
+
+Middleware with configuration:
+
+```ts
+function logger(options: { prefix: string }): Middleware {
+  return (next) => async (req, res) => {
+    console.log(`${options.prefix} ${req.method} ${req.pathname}`);
+    await next(req, res);
+  };
+}
+
+app.use(logger({ prefix: '[Zing] ' }));
+```
+
 [⬆️ Back to top](#-api)
 
 ### Zing.set404Handler()
@@ -381,7 +544,7 @@ By default, Zing has a default 404 handler that sends a `404 Not Found` response
 **Type**
 
 ```ts
-set404Handler(handler: (req: Request, res: Response) => Promise<void> |void): void;
+set404Handler(handler: Handler): void;
 ```
 
 **Parameters**
@@ -422,7 +585,7 @@ If you want to customize the response, you can set your own error handler.
 **Type**
 
 ```ts
-setErrorHandler(handler: (err: unknown, req: Request, res: Response) => Promise<void> |void): void;
+setErrorHandler(handler: ErrorHandler): void;
 ```
 
 **Parameters**
