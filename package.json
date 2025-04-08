@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "A lightweight web framework.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/transformgovsg/zing.git"
+  },
   "license": "MIT",
   "files": [
     "dist",
