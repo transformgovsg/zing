@@ -1,5 +1,7 @@
 import type { ServerResponse } from 'node:http';
 
+import type { SerialiseOptions } from './cookie.js';
+import { serialise } from './cookie.js';
 import { HTTPStatusCode } from './http-status-code.js';
 import type { HTTPHeaderKey, HTTPHeaders, HTTPHeaderValue, JSONObject } from './types.js';
 
@@ -40,6 +42,22 @@ export default class Response {
    */
   ok() {
     this.status(HTTPStatusCode.OK);
+  }
+
+  /**
+   * Sets a cookie on the response. If the response has already been sent,
+   * this method does nothing.
+   *
+   * @param name - The name of the cookie.
+   * @param value - The value of the cookie.
+   * @param options - The options for the cookie.
+   */
+  cookie(name: string, value: string, options?: SerialiseOptions) {
+    if (this.finished) {
+      return;
+    }
+
+    this.node.setHeader('Set-Cookie', serialise(name, value, options));
   }
 
   /**
