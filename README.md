@@ -4,7 +4,7 @@ A lightweight HTTP framework for **Node.js**.
 
 ## 🚧 Roadmap
 
-- [ ] Cookies
+- [x] ~~Cookies~~
 - [x] ~~Middleware~~
 - [ ] Server-sent events
 - [ ] Header, query, and body schema validation
@@ -79,6 +79,7 @@ process.on('SIGINT', async () => {
 - [Request.method](#requestmethod)
 - [Request.get()](#requestget)
 - [Request.set()](#requestset)
+- [Request.cookie()](#requestcookie)
 - [Request.param()](#requestparam)
 - [Request.query()](#requestquery)
 - [Request.queries()](#requestqueries)
@@ -90,6 +91,7 @@ process.on('SIGINT', async () => {
 - [Response.finished](#responsefinished)
 - [Response.status()](#responsestatus)
 - [Response.ok()](#responseok)
+- [Response.cookie()](#responsecookie)
 - [Response.json()](#responsejson)
 - [Response.text()](#responsetext)
 - [Response.header()](#responseheader)
@@ -742,6 +744,31 @@ app.get('/', (req, res) => {
 
 [⬆️ Back to top](#-api)
 
+#### Request.cookie()
+
+Returns the value of the given cookie name from the request. If the cookie is not found and no default value is provided, `null` is returned.
+
+**Type**
+
+```ts
+cookie(name: string, defaultValue?: string): string | null;
+```
+
+**Parameters**
+
+- `name` - The name of the cookie to get the value of.
+- `defaultValue` - The default value to return if the cookie is not found.
+
+**Example**
+
+```ts
+app.get('/', (req, res) => {
+  const value = req.cookie('name', 'defaultValue');
+});
+```
+
+[⬆️ Back to top](#-api)
+
 #### Request.param()
 
 Returns the value of the given parameter name from the request. If the parameter is not found and no default value is provided, `null` is returned.
@@ -1020,6 +1047,35 @@ ok(): void;
 ```ts
 app.get('/', (req, res) => {
   res.ok();
+});
+```
+
+[⬆️ Back to top](#-api)
+
+#### Response.cookie()
+
+Sets a cookie on the response.
+
+**Type**
+
+```ts
+cookie(name: string, value: string, options?: CookieOptions): void;
+```
+
+**Parameters**
+
+- `name` - The name of the cookie to set.
+- `value` - The value of the cookie to set.
+- `options` - The options for the cookie.
+
+**Example**
+
+```ts
+app.get('/', (req, res) => {
+  res.cookie('name', 'value', {
+    path: '/',
+    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+  });
 });
 ```
 
