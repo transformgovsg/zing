@@ -46,6 +46,277 @@ describeMatrix('Response', (ctx) => {
     });
   });
 
+  describe('cookie()', () => {
+    test('sets the cookie header', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar');
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar');
+    });
+
+    test('does not overwrite the cookie header if the response has already been sent', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar');
+
+        res.ok();
+
+        res.cookie('foo', 'qux');
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar');
+    });
+
+    test('sets the cookie header with encoded URI characters', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'ba r');
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=ba%20r');
+    });
+
+    test('sets the cookie header with `path` option', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', { path: '/foo' });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar; Path=/foo');
+    });
+
+    test('sets the cookie header with `domain` option', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', { domain: 'example.com' });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar; Domain=example.com');
+    });
+
+    test('sets the cookie header with `expires` option', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', { expires: new Date('2025-01-01') });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar; Expires=Wed, 01 Jan 2025 00:00:00 GMT');
+    });
+
+    describe('sets the cookie header with `maxAge` option', () => {
+      test('when `maxAge` is positive', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { maxAge: 1000 });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar; Max-Age=1000');
+      });
+
+      test('when `maxAge` is negative', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { maxAge: -1000 });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar; Max-Age=0');
+      });
+
+      test('when `maxAge` is `0`', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { maxAge: 0 });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar');
+      });
+    });
+
+    test('sets the cookie header with `secure` option', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', { secure: true });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar; Secure');
+    });
+
+    test('sets the cookie header with `httpOnly` option', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', { httpOnly: true });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe('foo=bar; HttpOnly');
+    });
+
+    describe('sets the cookie header with `sameSite` option', () => {
+      test('when `sameSite` is `strict`', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { sameSite: 'strict' });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar; SameSite=Strict');
+      });
+
+      test('when `sameSite` is `lax`', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { sameSite: 'lax' });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar; SameSite=Lax');
+      });
+
+      test('when `sameSite` is `none`', async () => {
+        const handler = vi.fn<Handler>((_, res) => {
+          res.cookie('foo', 'bar', { sameSite: 'none' });
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(res.headers.get('set-cookie')).toBe('foo=bar; SameSite=None');
+      });
+    });
+
+    test('sets the cookie header with multiple options', async () => {
+      const handler = vi.fn<Handler>((_, res) => {
+        res.cookie('foo', 'bar', {
+          path: '/',
+          domain: 'example.com',
+          secure: true,
+          httpOnly: true,
+          sameSite: 'none',
+        });
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie');
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get('set-cookie')).toBe(
+        'foo=bar; Path=/; Domain=example.com; Secure; HttpOnly; SameSite=None',
+      );
+    });
+  });
+
   describe('header()', () => {
     test('sets the header', async () => {
       const handler = vi.fn<Handler>((_, res) => {

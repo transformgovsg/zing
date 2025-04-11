@@ -1,5 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 
+import { parse } from './cookie.js';
 import {
   ContentTooLargeError,
   InternalServerError,
@@ -81,6 +82,22 @@ export default class Request {
     }
 
     this.#kv.set(key, value);
+  }
+
+  /**
+   * Returns the value of the given cookie name from the request. If the
+   * cookie is not found and no default value is provided, `null` is returned.
+   *
+   * @param name - The name of the cookie to get the value of.
+   * @param defaultValue - An optional default value to return if the cookie is not found.
+   */
+  cookie(name: string, defaultValue?: string) {
+    const cookie = this.header('cookie');
+    if (!cookie) {
+      return defaultValue ?? null;
+    }
+
+    return parse(cookie, name) ?? defaultValue ?? null;
   }
 
   /**

@@ -2,7 +2,7 @@ import type { Handler, HTTPMethod } from '../src/types.js';
 import { describeMatrix } from './_setup.js';
 
 describeMatrix('Request', (ctx) => {
-  describe('protocol()', () => {
+  describe('protocol', () => {
     test('returns the protocol', async () => {
       let actualProtocol: unknown;
 
@@ -17,12 +17,13 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/protocol');
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualProtocol).toBe('http');
     });
   });
 
-  describe('pathname()', () => {
+  describe('pathname', () => {
     test('returns the pathname', async () => {
       let actualPathname: unknown;
 
@@ -37,12 +38,13 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/pathname');
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualPathname).toBe('/pathname');
     });
   });
 
-  describe('method()', () => {
+  describe('method', () => {
     test.each<HTTPMethod>(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'])(
       'returns the HTTP method (%s)',
       async (method) => {
@@ -59,6 +61,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request(method, `/${method}`);
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualMethod).toBe(method);
       },
@@ -82,6 +85,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/kv');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualValue).toBe('bar');
       });
@@ -101,6 +105,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/kv');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualValue).toBe('bar');
       });
@@ -121,6 +126,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/kv');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualValue).toBeNull();
       });
@@ -139,6 +145,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/kv');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualValue).toBe('bar');
       });
@@ -162,6 +169,7 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/kv');
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualValue).toBeNull();
     });
@@ -182,8 +190,243 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/kv');
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualValue).toBeNull();
+    });
+  });
+
+  describe('cookie()', () => {
+    describe('when the cookie exists', () => {
+      test('returns the cookie value', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'foo=bar',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBe('bar');
+      });
+
+      test('returns the cookie value even if the default value is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo', 'qux');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'foo=bar',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBe('bar');
+      });
+    });
+
+    describe('when the cookie does not exist', () => {
+      test('returns `null` if no default value is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBeNull();
+      });
+
+      test('returns the default value if it is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo', 'bar');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie');
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBe('bar');
+      });
+    });
+
+    describe('when the cookie name is invalid', () => {
+      test('returns `null` if no default value is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          // Use an invalid cookie name (contains ' ').
+          actualCookie = req.cookie('fo o');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'fo o=bar',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBeNull();
+      });
+
+      test('returns the default value if it is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          // Use an invalid cookie name (contains ' ').
+          actualCookie = req.cookie('fo o', 'qux');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'fo o=bar',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBe('qux');
+      });
+    });
+
+    describe('when the cookie value is invalid', () => {
+      test('returns `null` if no default value is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'foo=ba r',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBeNull();
+      });
+
+      test('returns the default value if it is provided', async () => {
+        let actualCookie: unknown;
+
+        const handler = vi.fn<Handler>((req, res) => {
+          actualCookie = req.cookie('foo', 'qux');
+
+          res.ok();
+        });
+
+        ctx.app.get('/cookie', handler);
+
+        const res = await ctx.request('GET', '/cookie', {
+          headers: {
+            cookie: 'foo=ba r',
+          },
+        });
+
+        expect(handler).toHaveBeenCalled();
+
+        expect(res.status).toBe(200);
+        expect(actualCookie).toBe('qux');
+      });
+    });
+
+    test('returns the cookie value with decoded URI characters', async () => {
+      let actualCookie: unknown;
+
+      const handler = vi.fn<Handler>((req, res) => {
+        actualCookie = req.cookie('foo');
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie', {
+        headers: {
+          cookie: 'foo=ba%20r',
+        },
+      });
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(actualCookie).toBe('ba r');
+    });
+
+    test('returns the cookie value with double quotes removed', async () => {
+      let actualCookie: unknown;
+
+      const handler = vi.fn<Handler>((req, res) => {
+        actualCookie = req.cookie('foo');
+
+        res.ok();
+      });
+
+      ctx.app.get('/cookie', handler);
+
+      const res = await ctx.request('GET', '/cookie', {
+        headers: {
+          cookie: 'foo="bar"',
+        },
+      });
+
+      expect(handler).toHaveBeenCalled();
+
+      expect(res.status).toBe(200);
+      expect(actualCookie).toBe('bar');
     });
   });
 
@@ -203,6 +446,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/param/bar');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualParam).toBe('bar');
       });
@@ -221,6 +465,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/param/bar');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualParam).toBe('bar');
       });
@@ -241,6 +486,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/param');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualParam).toBeNull();
       });
@@ -259,6 +505,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/param');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualParam).toBe('bar');
       });
@@ -281,6 +528,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/query?foo=bar');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQuery).toBe('bar');
       });
@@ -299,6 +547,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/query?foo=bar');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQuery).toBe('bar');
       });
@@ -319,6 +568,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/query');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQuery).toBeNull();
       });
@@ -337,6 +587,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/query');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQuery).toBe('bar');
       });
@@ -356,6 +607,7 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/query?foo=bar&foo=baz');
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualQuery).toBe('bar');
     });
@@ -377,6 +629,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/queries?foo=bar&foo=qux');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQueries).toEqual(['bar', 'qux']);
       });
@@ -395,6 +648,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/queries?foo=bar&foo=qux');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQueries).toEqual(['bar', 'qux']);
       });
@@ -415,6 +669,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/queries');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQueries).toBeNull();
       });
@@ -433,6 +688,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/queries');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualQueries).toEqual(['bar', 'qux']);
       });
@@ -459,6 +715,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualHeader).toBe('bar');
       });
@@ -481,6 +738,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualHeader).toBe('bar');
       });
@@ -501,6 +759,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/header');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualHeader).toBeNull();
       });
@@ -519,6 +778,7 @@ describeMatrix('Request', (ctx) => {
         const res = await ctx.request('GET', '/header');
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualHeader).toBe('bar');
       });
@@ -542,6 +802,7 @@ describeMatrix('Request', (ctx) => {
       const res = await ctx.request('GET', '/header', { headers });
 
       expect(handler).toHaveBeenCalled();
+
       expect(res.status).toBe(200);
       expect(actualHeader).toBe('foo=bar, qux=123');
     });
@@ -567,6 +828,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualBody).toEqual(Buffer.from('foobar'));
       },
@@ -598,6 +860,7 @@ describeMatrix('Request', (ctx) => {
           });
 
           expect(handler).toHaveBeenCalled();
+
           expect(res.status).toBe(413);
           expect(res.headers.get('connection')).toBe('close');
           expect(actualBody).toBeUndefined();
@@ -627,6 +890,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualText).toEqual('foobar');
       },
@@ -659,6 +923,7 @@ describeMatrix('Request', (ctx) => {
           });
 
           expect(handler).toHaveBeenCalled();
+
           expect(res.status).toBe(413);
           expect(res.headers.get('connection')).toBe('close');
           expect(actualText).toBeUndefined();
@@ -685,6 +950,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(415);
         expect(res.headers.get('connection')).toBe('close');
         expect(actualText).toBeUndefined();
@@ -713,6 +979,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(200);
         expect(actualJSON).toEqual({ foo: 'bar' });
       },
@@ -745,6 +1012,7 @@ describeMatrix('Request', (ctx) => {
           });
 
           expect(handler).toHaveBeenCalled();
+
           expect(res.status).toBe(413);
           expect(res.headers.get('connection')).toBe('close');
           expect(actualJSON).toBeUndefined();
@@ -771,6 +1039,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(415);
         expect(res.headers.get('connection')).toBe('close');
         expect(actualJSON).toBeUndefined();
@@ -796,6 +1065,7 @@ describeMatrix('Request', (ctx) => {
         });
 
         expect(handler).toHaveBeenCalled();
+
         expect(res.status).toBe(422);
         expect(res.headers.get('connection')).toBe('close');
         expect(actualJSON).toBeUndefined();
