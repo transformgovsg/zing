@@ -94,48 +94,48 @@ export interface SerialiseOptions {
  * @param options - The options to serialise the cookie with.
  */
 export function serialise(name: string, value: string, options?: SerialiseOptions) {
-  const cookie = [`${name}=${encodeURIComponent(value)}`];
+  let cookie = `${name}=${encodeURIComponent(value)}`;
 
   if (options?.path) {
-    cookie.push(`Path=${options.path}`);
+    cookie += `; Path=${options.path}`;
   }
 
   if (options?.domain) {
-    cookie.push(`Domain=${options.domain}`);
+    cookie += `; Domain=${options.domain}`;
   }
 
   if (options?.expires) {
-    cookie.push(`Expires=${options.expires.toUTCString()}`);
+    cookie += `; Expires=${options.expires.toUTCString()}`;
   }
 
   if (options?.maxAge) {
     if (options.maxAge > 0) {
-      cookie.push(`Max-Age=${options.maxAge | 0}`);
+      cookie += `; Max-Age=${options.maxAge | 0}`;
     }
     if (options.maxAge < 0) {
-      cookie.push('Max-Age=0');
+      cookie += '; Max-Age=0';
     }
   }
 
   if (options?.secure) {
-    cookie.push('Secure');
+    cookie += '; Secure';
   }
 
   if (options?.httpOnly) {
-    cookie.push('HttpOnly');
+    cookie += '; HttpOnly';
   }
 
   switch (options?.sameSite) {
     case 'strict':
-      cookie.push('SameSite=Strict');
+      cookie += '; SameSite=Strict';
       break;
     case 'lax':
-      cookie.push('SameSite=Lax');
+      cookie += '; SameSite=Lax';
       break;
     case 'none':
-      cookie.push('SameSite=None');
+      cookie += '; SameSite=None';
       break;
   }
 
-  return cookie.join('; ');
+  return cookie;
 }
