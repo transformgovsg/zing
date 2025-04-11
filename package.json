@@ -7,6 +7,16 @@
     "type": "git",
     "url": "https://github.com/transformgovsg/zing.git"
   },
+  "keywords": [
+    "zing",
+    "web",
+    "framework",
+    "http",
+    "server",
+    "api",
+    "rest",
+    "router"
+  ],
   "license": "MIT",
   "files": [
     "dist",
