@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.3.0 (2025-04-13)
+
+### Feature ✨
+
+- feat: add option to configure `maxBodySize` when reading request content ([#14](https://github.com/transformgovsg/zing/pull/14)) ([395ce42](https://github.com/transformgovsg/zing/commit/395ce424d80a4ee38e0238dac1b54fdb7d38fa42))
+
+### Breaking Changes ⚠️
+
+- refactor!: rename `ZingError` to `BaseError` ([#13](https://github.com/transformgovsg/zing/pull/13)) ([ad5d4df](https://github.com/transformgovsg/zing/commit/ad5d4df127653e8b733512fe38129ac77048523b))
+
 ## 0.2.0 (2025-04-12)
 
 ### Feature ✨
