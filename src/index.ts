@@ -3,11 +3,11 @@ export { default } from './zing.js';
 
 // Others.
 export {
+  BaseError,
   ContentTooLargeError,
   InternalServerError,
   MalformedJSONError,
   UnsupportedContentTypeError,
-  ZingError,
 } from './errors.js';
 export { HTTPStatusCode } from './http-status-code.js';
 export { default as Request } from './request.js';

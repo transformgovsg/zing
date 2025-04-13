@@ -1,7 +1,7 @@
 /**
- * Base class for all errors in the Zing framework.
+ * Base class for all errors.
  */
-export class ZingError extends Error {
+export class BaseError extends Error {
   constructor(message: string) {
     super(message);
 
@@ -12,7 +12,7 @@ export class ZingError extends Error {
 /**
  * Thrown when the request content is too large.
  */
-export class ContentTooLargeError extends ZingError {
+export class ContentTooLargeError extends BaseError {
   readonly type = 'CONTENT_TOO_LARGE_ERROR';
 
   constructor() {
@@ -23,7 +23,7 @@ export class ContentTooLargeError extends ZingError {
 /**
  * Thrown when the request content type is not supported.
  */
-export class UnsupportedContentTypeError extends ZingError {
+export class UnsupportedContentTypeError extends BaseError {
   readonly type = 'UNSUPPORTED_CONTENT_TYPE_ERROR';
 
   constructor() {
@@ -34,7 +34,7 @@ export class UnsupportedContentTypeError extends ZingError {
 /**
  * Thrown when the request payload is not a valid JSON object.
  */
-export class MalformedJSONError extends ZingError {
+export class MalformedJSONError extends BaseError {
   readonly type = 'MALFORMED_JSON_ERROR';
 
   constructor() {
@@ -45,7 +45,7 @@ export class MalformedJSONError extends ZingError {
 /**
  * Thrown when an unexpected error occurs.
  */
-export class InternalServerError extends ZingError {
+export class InternalServerError extends BaseError {
   readonly type = 'INTERNAL_SERVER_ERROR';
 
   constructor(cause: unknown) {
