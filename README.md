@@ -60,6 +60,7 @@ process.on('SIGINT', async () => {
 
 ## 🔌 API
 
+- [Zing.constructor()](#zingconstructor)
 - [Zing.listen()](#zinglisten)
 - [Zing.shutdown()](#zingshutdown)
 - [Zing.route()](#zingroute)
@@ -95,6 +96,35 @@ process.on('SIGINT', async () => {
 - [Response.json()](#responsejson)
 - [Response.text()](#responsetext)
 - [Response.header()](#responseheader)
+
+### Zing.constructor()
+
+Creates a new Zing application.
+
+**Type**
+
+```ts
+constructor(options?: Partial<Options>);
+```
+
+**Parameters**
+
+- `options` - The options for the Zing application.
+  - `maxBodySize` - The maximum size of the body of a request. Default: `1_048_576`.
+
+**Example**
+
+```ts
+const app = new Zing();
+```
+
+With custom options:
+
+```ts
+const app = new Zing({ maxBodySize: 4 * 1024 }); // Limit to 4KB.
+```
+
+[⬆️ Back to top](#-api)
 
 ### Zing.listen()
 

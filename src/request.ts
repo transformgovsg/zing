@@ -7,6 +7,7 @@ import {
   MalformedJSONError,
   UnsupportedContentTypeError,
 } from './errors.js';
+import type { Options } from './options.js';
 import type { Result } from './result.js';
 import { ERR, OK } from './result.js';
 import type { HTTPMethod } from './types.js';
@@ -19,10 +20,12 @@ export default class Request {
   #kv = new Map<string, unknown>();
   #body: Uint8Array | null = null;
 
+  #options: Options;
   #url: URL;
 
-  constructor(req: IncomingMessage) {
+  constructor(req: IncomingMessage, options: Options) {
     this.node = req;
+    this.#options = options;
 
     const protocol =
       req.socket && 'encrypted' in req.socket && req.socket.encrypted ? 'https' : 'http';
@@ -199,7 +202,7 @@ export default class Request {
       return OK(null);
     }
 
-    if (Number(contentLength) > 1e6) {
+    if (Number(contentLength) > this.#options.maxBodySize) {
       return ERR(new ContentTooLargeError());
     }
 
@@ -215,7 +218,7 @@ export default class Request {
         const onData = (chunk: Uint8Array) => {
           totalLength += chunk.length;
 
-          if (totalLength > 1e6) {
+          if (totalLength > this.#options.maxBodySize) {
             this.node.removeListener('data', onData);
             this.node.removeListener('end', onEnd);
             this.node.removeListener('error', onError);

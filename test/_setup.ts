@@ -1,5 +1,6 @@
 import getPort from 'get-port';
 
+import type { Options } from '../src/options.js';
 import type { HTTPMethod, JSONObject } from '../src/types.js';
 import Zing from '../src/zing.js';
 
@@ -16,12 +17,20 @@ export function describeMatrix(
   title: string,
   fn: (ctx: { app: Zing; request: RequestFunction }) => Promise<void> | void,
 ) {
+  describeMatrixWithOptions(title, {}, fn);
+}
+
+export function describeMatrixWithOptions(
+  title: string,
+  options: Partial<Options>,
+  fn: (ctx: { app: Zing; request: RequestFunction }) => Promise<void> | void,
+) {
   describe(title, async () => {
     let app: Zing | null = null;
     let request: RequestFunction | null = null;
 
     beforeEach(async () => {
-      app = new Zing();
+      app = new Zing(options);
 
       const port = await getPort();
       await app.listen(port);

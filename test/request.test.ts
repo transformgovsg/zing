@@ -1,5 +1,5 @@
 import type { Handler, HTTPMethod } from '../src/types.js';
-import { describeMatrix } from './_setup.js';
+import { describeMatrix, describeMatrixWithOptions } from './_setup.js';
 
 describeMatrix('Request', (ctx) => {
   describe('protocol', () => {
@@ -871,7 +871,7 @@ describeMatrix('Request', (ctx) => {
 
   describe('text()', () => {
     test.each<HTTPMethod>(['PATCH', 'POST', 'PUT'])(
-      'returns the body for HTTP method (%s)',
+      'returns the parsed text for HTTP method (%s)',
       async (method) => {
         let actualText: unknown;
 
@@ -960,7 +960,7 @@ describeMatrix('Request', (ctx) => {
 
   describe('json()', () => {
     test.each<HTTPMethod>(['PATCH', 'POST', 'PUT'])(
-      'returns the body for HTTP method (%s)',
+      'returns the parsed JSON for HTTP method (%s)',
       async (method) => {
         let actualJSON: unknown;
 
@@ -1073,3 +1073,167 @@ describeMatrix('Request', (ctx) => {
     });
   });
 });
+
+describeMatrixWithOptions(
+  'Request with custom `maxBodySize` option',
+  { maxBodySize: 100 },
+  (ctx) => {
+    describe('body()', () => {
+      test.each<HTTPMethod>(['PATCH', 'POST', 'PUT'])(
+        'returns the body for HTTP method (%s)',
+        async (method) => {
+          let actualBody: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.body();
+            actualBody = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.route(method, '/body', handler);
+
+          const res = await ctx.request(method, '/body', {
+            body: 'a' + 'a'.repeat(99),
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(200);
+          expect(actualBody).toEqual(Buffer.from('a' + 'a'.repeat(99)));
+        },
+      );
+
+      describe('when the request content is too large', () => {
+        test('responds with a `413` status code', async () => {
+          let actualBody: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.body();
+            actualBody = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.post('/body', handler);
+
+          const res = await ctx.request('POST', '/body', {
+            body: 'a' + 'a'.repeat(100),
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(413);
+          expect(res.headers.get('connection')).toBe('close');
+          expect(actualBody).toBeUndefined();
+        });
+      });
+    });
+
+    describe('text()', () => {
+      test.each<HTTPMethod>(['PATCH', 'POST', 'PUT'])(
+        'returns the parsed text for HTTP method (%s)',
+        async (method) => {
+          let actualText: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.text();
+            actualText = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.route(method, '/text', handler);
+
+          const res = await ctx.request(method, '/text', {
+            body: 'a' + 'a'.repeat(99),
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(200);
+          expect(actualText).toBe('a' + 'a'.repeat(99));
+        },
+      );
+
+      describe('when the request content is too large', () => {
+        test('responds with a `413` status code', async () => {
+          let actualText: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.text();
+            actualText = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.post('/text', handler);
+
+          const res = await ctx.request('POST', '/text', {
+            body: 'a' + 'a'.repeat(100),
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(413);
+          expect(res.headers.get('connection')).toBe('close');
+          expect(actualText).toBeUndefined();
+        });
+      });
+    });
+
+    describe('json()', () => {
+      test.each<HTTPMethod>(['PATCH', 'POST', 'PUT'])(
+        'returns the parsed JSON for HTTP method (%s)',
+        async (method) => {
+          let actualJSON: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.json();
+            actualJSON = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.route(method, '/json', handler);
+
+          const res = await ctx.request(method, '/json', {
+            body: { foo: 'bar' },
+            headers: { 'content-type': 'application/json' },
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(200);
+          expect(actualJSON).toEqual({ foo: 'bar' });
+        },
+      );
+
+      describe('when the request content is too large', () => {
+        test('responds with a `413` status code', async () => {
+          let actualJSON: unknown;
+
+          const handler = vi.fn<Handler>(async (req, res) => {
+            const result = await req.json();
+            actualJSON = result.unwrap();
+
+            res.ok();
+          });
+
+          ctx.app.post('/json', handler);
+
+          const res = await ctx.request('POST', '/json', {
+            body: { foo: 'a'.repeat(100) },
+            headers: { 'content-type': 'application/json' },
+          });
+
+          expect(handler).toHaveBeenCalled();
+
+          expect(res.status).toBe(413);
+          expect(res.headers.get('connection')).toBe('close');
+          expect(actualJSON).toBeUndefined();
+        });
+      });
+    });
+  },
+);

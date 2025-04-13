@@ -5,6 +5,8 @@ import type { Socket } from 'node:net';
 
 import { ContentTooLargeError, MalformedJSONError, UnsupportedContentTypeError } from './errors.js';
 import { HTTPStatusCode } from './http-status-code.js';
+import type { Options } from './options.js';
+import { DEFAULT_OPTIONS } from './options.js';
 import Request from './request.js';
 import Response from './response.js';
 import Router from './router.js';
@@ -51,10 +53,16 @@ export default class Zing {
   #fn404Handler: Handler = DEFAULT_404_HANDLER;
   #fnErrorHandler: ErrorHandler = DEFAULT_ERROR_HANDLER;
 
+  #options: Options;
   #server: HTTPServer;
   #router: Router<{ handler: Handler }>;
 
-  constructor() {
+  constructor(options: Partial<Options> = {}) {
+    this.#options = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
+
     this.#server = createHTTPServer(this.#dispatch.bind(this));
     this.#router = new Router();
   }
@@ -280,7 +288,7 @@ export default class Zing {
   }
 
   async #dispatch(nodeReq: IncomingMessage, nodeRes: ServerResponse) {
-    const req = new Request(nodeReq);
+    const req = new Request(nodeReq, this.#options);
     const res = new Response(nodeRes);
 
     try {
