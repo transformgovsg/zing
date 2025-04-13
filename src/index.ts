@@ -14,6 +14,7 @@ export { default as Request } from './request.js';
 export { default as Response } from './response.js';
 
 // Types.
+export type { Options } from './options.js';
 export type {
   ErrorHandler,
   Handler,
