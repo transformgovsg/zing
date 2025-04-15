@@ -234,7 +234,13 @@ export default class Request {
           this.node.removeListener('end', onEnd);
           this.node.removeListener('error', onError);
 
-          this.#body = Buffer.concat(chunks);
+          this.#body = new Uint8Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
+          let offset = 0;
+          for (const chunk of chunks) {
+            this.#body.set(chunk, offset);
+            offset += chunk.length;
+          }
+
           resolve(OK(this.#body));
         };
 
@@ -276,7 +282,11 @@ export default class Request {
       return ERR(result.error);
     }
 
-    return OK(result.value?.toString() ?? null);
+    if (!result.value) {
+      return OK(null);
+    }
+
+    return OK(new TextDecoder().decode(result.value));
   }
 
   /**
@@ -311,7 +321,7 @@ export default class Request {
     }
 
     try {
-      return OK(JSON.parse(result.value.toString()));
+      return OK(JSON.parse(new TextDecoder().decode(result.value)));
     } catch (err) {
       if (err instanceof SyntaxError) {
         return ERR(new MalformedJSONError());
