@@ -830,7 +830,7 @@ describeMatrix('Request', (ctx) => {
         expect(handler).toHaveBeenCalled();
 
         expect(res.status).toBe(200);
-        expect(actualBody).toEqual(Buffer.from('foobar'));
+        expect(actualBody).toEqual(new TextEncoder().encode('foobar'));
       },
     );
 
@@ -1100,7 +1100,7 @@ describeMatrixWithOptions(
           expect(handler).toHaveBeenCalled();
 
           expect(res.status).toBe(200);
-          expect(actualBody).toEqual(Buffer.from('a' + 'a'.repeat(99)));
+          expect(actualBody).toEqual(new TextEncoder().encode('a' + 'a'.repeat(99)));
         },
       );
 
